@@ -18,13 +18,11 @@ Key aspects ported from my dwm setup:
 
 - **DWM-style layouts**: Tall, fat, and stack layouts with master/stack ratio control
 - **Custom tab bar**: Always-visible tab bar with date/time status display
-- **Smart integrations**:
-  - File finder with preview (fzf + bat + neovim)
-  - Git TUI (lazygit)
-  - Directory jumper (zoxide + fzf)
-  - SSH launcher (fzf + kitten ssh for remote shell integration)
-  - Scrollback search (fzf)
-  - Kitten hints for URL/path selection
+- **Smart integrations** (two patterns):
+  - **New tab pattern**: Directory jumper, SSH launcher (create new context, auto-close on cancel)
+  - **Overlay pattern**: Git TUI, file finder, scrollback search, command history (enhance current context)
+  - All use fzf for selection with keyboard-driven workflows
+  - SSH uses kitten ssh for automatic remote shell integration
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
 - **Window state memory**: Remembers window size, position, and fullscreen state
 - **Oceanic Next theme**: Clean, modern color scheme
