@@ -43,6 +43,4 @@ deps:
 	@echo "✓ lazygit installed"
 	@command -v zoxide >/dev/null 2>&1 || { echo "Installing zoxide..."; brew install zoxide; }
 	@echo "✓ zoxide installed"
-	@command -v sshs >/dev/null 2>&1 || { echo "Installing sshs..."; brew install sshs; }
-	@echo "✓ sshs installed"
 	@echo ""

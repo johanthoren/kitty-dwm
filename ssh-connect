@@ -1,0 +1,33 @@
+#!/bin/zsh
+# Parse SSH connection string and launch kitten ssh
+# Supports: host, user@host, host:port, user@host:port
+
+input="$1"
+[[ -z "$input" ]] && exit 0
+
+# Extract port if present (ends with :digits)
+port=""
+if [[ "$input" =~ :([0-9]+)$ ]]; then
+    port="${match[1]}"
+    input="${input%:*}"
+fi
+
+# Build command with connection timeout
+if [[ -n "$port" ]]; then
+    cmd="kitten ssh -o ConnectTimeout=10 -p $port $input"
+else
+    cmd="kitten ssh -o ConnectTimeout=10 $input"
+fi
+
+# Show the command being executed
+echo "Running: \"$cmd\""
+
+# Execute
+eval "$cmd"
+exitcode=$?
+
+# Show disconnect message
+echo ""
+echo "Connection closed (exit code: $exitcode)"
+echo "Press Enter to close tab..."
+read

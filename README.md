@@ -22,7 +22,7 @@ Key aspects ported from my dwm setup:
   - File finder with preview (fzf + bat + neovim)
   - Git TUI (lazygit)
   - Directory jumper (zoxide + fzf)
-  - SSH manager (sshs)
+  - SSH launcher (fzf + kitten ssh for remote shell integration)
   - Scrollback search (fzf)
   - Kitten hints for URL/path selection
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
@@ -46,7 +46,7 @@ make install
 ```
 
 This will:
-1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide, sshs)
+1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide)
 2. Create symlinks to your `~/.config/kitty/` directory
 3. Prompt before overwriting existing configs
 
@@ -57,7 +57,7 @@ This will:
 ```bash
 # Install dependencies
 brew install --cask kitty
-brew install fzf bat neovim lazygit zoxide sshs
+brew install fzf bat neovim lazygit zoxide
 
 # Link configs
 ln -s ~/.config/kitty-dwm/kitty.conf ~/.config/kitty/kitty.conf
@@ -115,7 +115,7 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 | `cmd+shift+y` | Copy line | Select line from screen and copy to clipboard |
 | `cmd+shift+g` | Git TUI | Launch lazygit in overlay |
 | `cmd+shift+z` | Directory jumper | zoxide picker → new tab in directory |
-| `cmd+shift+s` | SSH launcher | sshs picker → new tab with SSH session |
+| `cmd+shift+s` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
 | `cmd+shift+a` | Launch Claude Code | New window with Claude in current directory |
 
@@ -146,7 +146,6 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 - **[neovim](https://neovim.io/)** - Text editor
 - **[lazygit](https://github.com/jesseduffield/lazygit)** - Git TUI
 - **[zoxide](https://github.com/ajeetdsouza/zoxide)** - Smart directory jumper
-- **[sshs](https://github.com/quantumsheep/sshs)** - SSH connection manager
 
 ## Configuration
 
@@ -182,7 +181,7 @@ Edit `kitty.conf` to customize:
 1. **Shell setup**: This configuration assumes zsh with [Powerlevel10k](https://github.com/romkatv/powerlevel10k) prompt. Some settings (like `ignore-shell` in close confirmations) are specifically to accommodate p10k's background processes.
 2. **Shell integration**: Requires zsh/bash with kitty integration for process detection
 3. **Remote processes**: Confirmation works for local processes (including SSH client), but not processes on remote hosts
-4. **SSH sessions**: Use `cmd+shift+s` for managed sessions that auto-close on exit
+4. **SSH sessions**: Use `cmd+shift+s` to select from ~/.ssh/config (showing host details) or type any connection (formats: host, user@host, host:port, user@host:port). Uses `kitten ssh` for automatic remote shell integration, enabling features like `cmd+shift+c` to copy last command output even on remote hosts. Confirms before closing only when processes are running; shows command and disconnect message for troubleshooting
 
 ## License
 
