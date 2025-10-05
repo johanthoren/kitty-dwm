@@ -1,0 +1,53 @@
+#!/usr/bin/env python3
+"""Parse SSH config and display hosts with their details
+Output format: hostname | user@destination:port
+"""
+
+import sys
+from pathlib import Path
+
+config_file = Path.home() / ".ssh/config"
+
+if not config_file.exists():
+    sys.exit(0)
+
+host = ""
+user = ""
+hostname = ""
+port = ""
+
+def print_host():
+    """Print the current host entry if valid"""
+    global host, user, hostname, port
+
+    if host and '*' not in host:
+        dest = hostname if hostname else host
+        userpart = f"{user}@" if user else ""
+        portpart = f":{port}" if port and port != "22" else ""
+        print(f"{host:<20}  {userpart}{dest}{portpart}")
+
+with open(config_file) as f:
+    for line in f:
+        line = line.strip()
+
+        if line.startswith('Host '):
+            # Print previous host if exists
+            print_host()
+
+            # Start new host
+            host = line.split()[1]
+            user = ""
+            hostname = ""
+            port = ""
+
+        elif line.startswith('User '):
+            user = line.split()[1]
+
+        elif line.startswith('HostName '):
+            hostname = line.split()[1]
+
+        elif line.startswith('Port '):
+            port = line.split()[1]
+
+# Print last host
+print_host()

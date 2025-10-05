@@ -1,0 +1,65 @@
+#!/usr/bin/env python3
+"""Prune non-existent projects from inventory"""
+
+import os
+import sys
+import tty
+import termios
+from pathlib import Path
+
+def wait_for_key():
+    """Wait for any key press"""
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+projects_file = Path.home() / ".config/kitty/projects"
+
+if not projects_file.exists():
+    print()
+    print("No projects file found")
+    print()
+    print("Press any key to close...")
+    wait_for_key()
+    sys.exit(1)
+
+print()
+print("Pruning non-existent projects...")
+print("================================")
+print()
+
+removed_count = 0
+remaining = []
+
+with open(projects_file) as f:
+    for line in f:
+        path = line.strip()
+        if not path:
+            continue
+
+        if os.path.isdir(path):
+            # Project exists - keep it
+            remaining.append(path)
+        else:
+            # Project doesn't exist - remove it
+            print(f"✗ Removed: {os.path.basename(path)} ({path})")
+            removed_count += 1
+
+# Write pruned list
+with open(projects_file, 'w') as f:
+    for path in remaining:
+        f.write(f"{path}\n")
+
+print()
+if removed_count == 0:
+    print("No projects needed pruning")
+else:
+    print(f"Removed {removed_count} project(s)")
+
+print()
+print("Press any key to close...")
+wait_for_key()

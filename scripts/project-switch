@@ -1,0 +1,85 @@
+#!/usr/bin/env python3
+"""Project switcher - focus existing project tab or create new one"""
+
+import os
+import sys
+import subprocess
+import json
+import tty
+import termios
+from pathlib import Path
+
+def wait_for_key():
+    """Wait for any key press"""
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+# Read projects file
+projects_file = Path.home() / ".config/kitty/projects"
+
+if not projects_file.exists():
+    print(f"No projects file found at {projects_file}")
+    print("Press any key to close...")
+    wait_for_key()
+    sys.exit(1)
+
+# Build project map: basename -> full path
+project_map = {}
+with open(projects_file) as f:
+    for line in f:
+        path = line.strip()
+        if path:
+            name = os.path.basename(path)
+            project_map[name] = path
+
+# Show projects in fzf
+project_names = sorted(project_map.keys())
+fzf = subprocess.Popen(
+    ['fzf', '--prompt=Project> ', '--header=Select project'],
+    stdin=subprocess.PIPE,
+    stdout=subprocess.PIPE,
+    text=True
+)
+selected, _ = fzf.communicate('\n'.join(project_names))
+
+if fzf.returncode != 0 or not selected.strip():
+    sys.exit(0)  # Cancelled
+
+project_name = selected.strip()
+project_path = project_map[project_name]
+
+# Check if project tab already exists
+try:
+    result = subprocess.run(['kitten', '@', 'ls'], capture_output=True, text=True)
+    data = json.loads(result.stdout)
+
+    # Find tab with matching title
+    existing_tab = None
+    for window in data:
+        for tab in window.get('tabs', []):
+            if tab.get('title') == project_name:
+                existing_tab = tab.get('id')
+                break
+        if existing_tab:
+            break
+
+    if existing_tab:
+        # Tab exists - focus it
+        subprocess.run(['kitten', '@', 'focus-tab', '--match', f'id:{existing_tab}'])
+    else:
+        # Tab doesn't exist - we're already in a new tab
+        # Change directory, set title, and launch shell
+        os.chdir(project_path)
+        subprocess.run(['kitten', '@', 'set-tab-title', project_name])
+        os.execvp('zsh', ['zsh'])
+
+except Exception as e:
+    print(f"Error: {e}")
+    print("Press any key to close...")
+    wait_for_key()
+    sys.exit(1)

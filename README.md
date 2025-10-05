@@ -18,10 +18,16 @@ Key aspects ported from my dwm setup:
 
 - **DWM-style layouts**: Tall, fat, and stack layouts with master/stack ratio control
 - **Custom tab bar**: Always-visible tab bar with date/time status display
+- **Project management**: Projectile-inspired workflow with explicit inventory
+  - Named project tabs (focus existing or create new)
+  - Quick project switching with fzf
+  - Add/remove/prune project inventory (Python scripts)
+  - Smart confirmations (defaults to Y for add, N for remove)
 - **Smart integrations** (two patterns):
-  - **New tab pattern**: Directory jumper, SSH launcher (create new context, auto-close on cancel)
-  - **Overlay pattern**: Git TUI, file finder, scrollback search, command history (enhance current context)
+  - **New tab pattern**: Project switcher, directory jumper, SSH launcher (create new context, auto-close on cancel)
+  - **Overlay pattern**: Git TUI, file finder, scrollback search, command history, project management (enhance current context)
   - All use fzf for selection with keyboard-driven workflows
+  - SSH and project scripts written in Python for reliability
   - SSH uses kitten ssh for automatic remote shell integration
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
 - **Window state memory**: Remembers window size, position, and fullscreen state
@@ -108,7 +114,7 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 | `cmd+f` | Find in files | ripgrep content search → opens in neovim at matching line |
 | `cmd+p` | File finder | fzf file picker → opens in neovim |
 | `cmd+u` | Open URL | Select URL from screen and open in browser |
-| `cmd+shift+p` | Insert path | Select path from screen and insert at cursor |
+| `cmd+shift+i` | Insert path | Select path from screen and insert at cursor |
 | `cmd+shift+o` | Open path in nvim | Select path from screen and open in neovim |
 | `cmd+shift+y` | Copy line | Select line from screen and copy to clipboard |
 | `cmd+shift+g` | Git TUI | Launch lazygit in overlay |
@@ -116,6 +122,17 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 | `cmd+shift+s` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
 | `cmd+shift+a` | Launch Claude Code | New window with Claude in current directory |
+
+### Project Management
+
+| Key | Action | Description |
+|-----|--------|-------------|
+| `cmd+shift+p` | Project switcher | Switch to project (focus existing tab or create new) |
+| `cmd+alt+p` | Add project | Add current directory to project inventory |
+| `cmd+ctrl+p` | Remove project | Remove current directory from inventory (or select if not a project) |
+| `cmd+ctrl+shift+p` | Prune projects | Remove non-existent directories from inventory |
+
+Projects are managed via an explicit inventory at `~/.config/kitty/projects`. Each project gets a named tab (using the project directory basename). The switcher intelligently focuses existing project tabs or creates new ones.
 
 ### Kitty Management
 
@@ -180,6 +197,7 @@ Edit `kitty.conf` to customize:
 2. **Shell integration**: Requires zsh/bash with kitty integration for process detection
 3. **Remote processes**: Confirmation works for local processes (including SSH client), but not processes on remote hosts
 4. **SSH sessions**: Use `cmd+shift+s` to select from ~/.ssh/config (showing host details) or type any connection (formats: host, user@host, host:port, user@host:port). Uses `kitten ssh` for automatic remote shell integration, enabling features like `cmd+shift+c` to copy last command output even on remote hosts. Confirms before closing only when processes are running; shows command and disconnect message for troubleshooting
+5. **Project workflow**: Projects are managed via `~/.config/kitty/projects` (one path per line). Use `cmd+shift+p` to switch between projects - it will focus existing tabs or create new ones. Each project tab is named after the project directory. Use `cmd+alt+p` to add current directory to projects, `cmd+ctrl+p` to remove, and `cmd+ctrl+shift+p` to prune deleted directories
 
 ## License
 

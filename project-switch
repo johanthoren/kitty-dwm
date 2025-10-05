@@ -1,0 +1,39 @@
+#!/bin/zsh
+# Project switcher - focus existing project tab or create new one
+
+projects_file=~/.config/kitty/projects
+
+# Check if projects file exists
+[[ ! -f "$projects_file" ]] && echo "No projects file found at $projects_file" && exit 1
+
+# Build associative array: basename -> full path
+typeset -A project_map
+while IFS= read -r path; do
+    [[ -z "$path" ]] && continue
+    basename=$(/usr/bin/basename "$path")
+    project_map[$basename]=$path
+done < "$projects_file"
+
+# Show projects in fzf
+selected=$(printf '%s\n' "${(@k)project_map}" | sort | fzf --prompt="Project> " --header="Select project")
+
+# Exit if cancelled
+[[ -z "$selected" ]] && exit 0
+
+# Get full path
+project_path="${project_map[$selected]}"
+project_name="$selected"
+
+# Check if project tab already exists
+existing_tab=$(kitten @ ls | jq -r ".[].tabs[] | select(.title == \"$project_name\") | .id" 2>/dev/null | head -1)
+
+if [[ -n "$existing_tab" ]]; then
+    # Tab exists - focus it
+    kitten @ focus-tab --match id:$existing_tab
+else
+    # Tab doesn't exist - we're already in a new tab
+    # Just cd to project and set title
+    cd "$project_path" || exit 1
+    kitten @ set-tab-title "$project_name"
+    exec zsh
+fi

@@ -1,0 +1,73 @@
+#!/usr/bin/env python3
+"""Add current directory to projects"""
+
+import os
+import sys
+import tty
+import termios
+from pathlib import Path
+
+def wait_for_key():
+    """Wait for any key press"""
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+projects_file = Path.home() / ".config/kitty/projects"
+current_dir = os.getcwd()
+project_name = os.path.basename(current_dir)
+
+# Check if already exists
+existing_projects = set()
+if projects_file.exists():
+    with open(projects_file) as f:
+        existing_projects = {line.strip() for line in f if line.strip()}
+
+already_exists = current_dir in existing_projects
+
+# Show confirmation
+print()
+if already_exists:
+    print("Project already in inventory!")
+else:
+    print("Add project to inventory?")
+print()
+print(f"  Name: {project_name}")
+print(f"  Path: {current_dir}")
+print()
+
+if already_exists:
+    print("Press any key to close...")
+    wait_for_key()
+    sys.exit(0)
+
+response = input("Add project? [Y/n] ").strip().lower()
+
+if response in ('', 'y', 'yes'):
+    # Read existing projects
+    projects = set()
+    if projects_file.exists():
+        with open(projects_file) as f:
+            projects = {line.strip() for line in f if line.strip()}
+
+    # Add new project
+    projects.add(current_dir)
+
+    # Write back sorted
+    with open(projects_file, 'w') as f:
+        for path in sorted(projects):
+            f.write(f"{path}\n")
+
+    print()
+    print(f"✓ Added {project_name} to projects")
+else:
+    print()
+    print("Cancelled")
+
+print()
+print("Press any key to close...")
+wait_for_key()

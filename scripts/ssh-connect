@@ -1,0 +1,50 @@
+#!/usr/bin/env python3
+"""Parse SSH connection string and launch kitten ssh
+Supports: host, user@host, host:port, user@host:port
+"""
+
+import sys
+import re
+import subprocess
+import tty
+import termios
+
+def wait_for_key():
+    """Wait for any key press"""
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+if len(sys.argv) < 2:
+    sys.exit(0)
+
+input_str = sys.argv[1]
+
+# Extract port if present (ends with :digits)
+port = None
+match = re.search(r':(\d+)$', input_str)
+if match:
+    port = match.group(1)
+    input_str = input_str[:match.start()]
+
+# Build command with connection timeout
+cmd = ['kitten', 'ssh', '-o', 'ConnectTimeout=10']
+if port:
+    cmd.extend(['-p', port])
+cmd.append(input_str)
+
+# Show the command being executed
+print(f'Running: "{" ".join(cmd)}"')
+
+# Execute
+exitcode = subprocess.call(cmd)
+
+# Show disconnect message
+print()
+print(f"Connection closed (exit code: {exitcode})")
+print("Press any key to close tab...")
+wait_for_key()
