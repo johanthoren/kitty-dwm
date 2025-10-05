@@ -1,0 +1,168 @@
+#!/usr/bin/env python3
+"""Display kitty keybindings with fzf fuzzy finding."""
+
+import re
+import subprocess
+from pathlib import Path
+
+
+def parse_keybindings():
+    """Parse kitty.conf and extract keybindings organized by section."""
+    config_path = Path.home() / ".config/kitty/kitty.conf"
+
+    sections = {}
+    current_section = "Other"
+
+    with open(config_path) as f:
+        for line in f:
+            line = line.strip()
+
+            # Detect section headers from comments
+            if line.startswith("# ----------"):
+                # Extract section name between dashes
+                match = re.search(r"# ---------- (.+?) ----------", line)
+                if match:
+                    current_section = match.group(1)
+                    sections[current_section] = []
+
+            # Parse map directives
+            elif line.startswith("map "):
+                parts = line.split(maxsplit=2)
+                if len(parts) >= 3:
+                    keybind = parts[1]
+                    action = parts[2]
+
+                    # Extract inline comment if present
+                    comment = ""
+                    if "#" in action:
+                        action, comment = action.split("#", 1)
+                        action = action.strip()
+                        comment = comment.strip()
+
+                    if current_section not in sections:
+                        sections[current_section] = []
+
+                    sections[current_section].append({
+                        "key": keybind,
+                        "action": action,
+                        "comment": comment,
+                        "section": current_section
+                    })
+
+    return sections
+
+
+def format_key(key):
+    """Format key binding for display."""
+    replacements = {
+        "cmd": "⌘",
+        "shift": "⇧",
+        "ctrl": "⌃",
+        "alt": "⌥",
+        "return": "↵",
+        "space": "Space"
+    }
+
+    parts = key.split("+")
+    formatted = []
+    for part in parts:
+        formatted.append(replacements.get(part.lower(), part.upper()))
+
+    return "+".join(formatted)
+
+
+def display_keybindings():
+    """Display keybindings with fzf for fuzzy finding and execution."""
+    sections = parse_keybindings()
+
+    # Define section order (from kitty.conf)
+    section_order = [
+        "Window Management (DWM: j/k/h/l)",
+        "Layout Management",
+        "Font Size",
+        "Tab Management (DWM Tags/Workspaces)",
+        "Additional Navigation",
+        "Copy/Paste",
+        "Scrolling",
+        "Kitty Management",
+        "Search",
+        "FZF Integrations",
+        "Project Management",
+        "Kitten Hints (URL/Path Selection)"
+    ]
+
+    # Build fzf input with section headers and keybindings
+    # Also build a mapping of display line to keybinding
+    lines = []
+    key_map = {}
+
+    for section in section_order:
+        if section in sections and sections[section]:
+            # Add section header (empty key mapping)
+            header = f"\n━━ {section} ━━"
+            lines.append(header)
+            key_map[header] = None
+
+            for binding in sections[section]:
+                key_display = format_key(binding["key"])
+                action = binding["action"]
+
+                # Truncate long actions for display
+                if len(action) > 60:
+                    action_display = action[:57] + "..."
+                else:
+                    action_display = action
+
+                # Format: KEY | ACTION
+                line = f"  {key_display:<20} │ {action_display}"
+                lines.append(line)
+                # Store the raw keybinding for execution
+                key_map[line] = binding["key"]
+
+    # Add any remaining sections not in ordered list
+    for section, bindings in sections.items():
+        if section not in section_order and bindings:
+            header = f"\n━━ {section} ━━"
+            lines.append(header)
+            key_map[header] = None
+
+            for binding in bindings:
+                key_display = format_key(binding["key"])
+                action = binding["action"]
+
+                if len(action) > 60:
+                    action_display = action[:57] + "..."
+                else:
+                    action_display = action
+
+                line = f"  {key_display:<20} │ {action_display}"
+                lines.append(line)
+                key_map[line] = binding["key"]
+
+    # Pipe to fzf and get selection
+    fzf_input = "\n".join(lines)
+
+    # Always write debug first to see if we even get here
+    debug_file = Path.home() / ".config/kitty/keybinding-debug.txt"
+    with open(debug_file, "w") as f:
+        f.write("Script reached fzf section\n")
+
+    subprocess.run(
+        [
+            "fzf",
+            "--header=KITTY KEYBINDINGS - Type to search, ESC to close",
+            "--header-first",
+            "--layout=reverse",
+            "--border",
+            "--prompt=Search> ",
+            "--bind=enter:ignore",
+            "--bind=start:enable-search+clear-query",
+            "--disabled"
+        ],
+        input=fzf_input,
+        text=True
+    )
+
+
+if __name__ == "__main__":
+    display_keybindings()
