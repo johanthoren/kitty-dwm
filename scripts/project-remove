@@ -1,0 +1,112 @@
+#!/usr/bin/env python3
+"""Remove a project from inventory"""
+
+import os
+import sys
+import subprocess
+import tty
+import termios
+from pathlib import Path
+
+def wait_for_key():
+    """Wait for any key press"""
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(fd)
+        sys.stdin.read(1)
+    finally:
+        termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+
+projects_file = Path.home() / ".config/kitty/projects"
+current_dir = os.getcwd()
+
+if not projects_file.exists():
+    print()
+    print("No projects file found")
+    print()
+    print("Press any key to close...")
+    wait_for_key()
+    sys.exit(1)
+
+# Read projects and build display list
+projects = {}
+with open(projects_file) as f:
+    for line in f:
+        path = line.strip()
+        if path:
+            name = os.path.basename(path)
+            projects[f"{name}  {path}"] = path
+
+if not projects:
+    print()
+    print("No projects in inventory")
+    print()
+    print("Press any key to close...")
+    wait_for_key()
+    sys.exit(0)
+
+# Check if current directory is a project
+current_is_project = current_dir in projects.values()
+
+if current_is_project:
+    # Current directory is a project - use it directly
+    project_path = current_dir
+    project_name = os.path.basename(current_dir)
+else:
+    # Current directory not a project - let user select from list
+    print()
+    print("Current directory is not in project inventory")
+    print()
+    print(f"  Current: {current_dir}")
+    print()
+    print("Select a project to remove:")
+    print()
+
+    # Show in fzf
+    fzf = subprocess.Popen(
+        ['fzf', '--prompt=Remove project: ', '--header=Select project to remove'],
+        stdin=subprocess.PIPE,
+        stdout=subprocess.PIPE,
+        text=True
+    )
+    selected, _ = fzf.communicate('\n'.join(projects.keys()))
+
+    if fzf.returncode != 0 or not selected.strip():
+        sys.exit(0)  # Cancelled
+
+    project_path = projects[selected.strip()]
+    project_name = os.path.basename(project_path)
+
+# Confirm removal
+print()
+print("Remove project from inventory?")
+print()
+print(f"  Name: {project_name}")
+print(f"  Path: {project_path}")
+print()
+
+response = input("Remove? [y/N] ").strip().lower()
+
+if response in ('y', 'yes'):
+    # Remove from file
+    remaining = []
+    with open(projects_file) as f:
+        for line in f:
+            path = line.strip()
+            if path and path != project_path:
+                remaining.append(path)
+
+    with open(projects_file, 'w') as f:
+        for path in remaining:
+            f.write(f"{path}\n")
+
+    print()
+    print(f"✓ Removed {project_name} from projects")
+else:
+    print()
+    print("Cancelled")
+
+print()
+print("Press any key to close...")
+wait_for_key()
