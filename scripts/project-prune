@@ -19,13 +19,17 @@ def wait_for_key():
 
 projects_file = Path.home() / ".config/kitty/projects"
 
+# Create projects file if it doesn't exist
 if not projects_file.exists():
+    projects_file.parent.mkdir(parents=True, exist_ok=True)
+    projects_file.touch()
     print()
-    print("No projects file found")
+    print("No projects configured yet.")
+    print("Add projects with Cmd+Alt+P")
     print()
     print("Press any key to close...")
     wait_for_key()
-    sys.exit(1)
+    sys.exit(0)
 
 print()
 print("Pruning non-existent projects...")

@@ -19,15 +19,20 @@ def wait_for_key():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 projects_file = Path.home() / ".config/kitty/projects"
-current_dir = os.getcwd()
 
+# Create projects file if it doesn't exist
 if not projects_file.exists():
+    projects_file.parent.mkdir(parents=True, exist_ok=True)
+    projects_file.touch()
     print()
-    print("No projects file found")
+    print("No projects configured yet.")
+    print("Add projects with Cmd+Alt+P")
     print()
     print("Press any key to close...")
     wait_for_key()
-    sys.exit(1)
+    sys.exit(0)
+
+current_dir = os.getcwd()
 
 # Read projects and build display list
 projects = {}

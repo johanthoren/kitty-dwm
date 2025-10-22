@@ -18,6 +18,12 @@ def wait_for_key():
         termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
 
 projects_file = Path.home() / ".config/kitty/projects"
+
+# Create projects file if it doesn't exist
+if not projects_file.exists():
+    projects_file.parent.mkdir(parents=True, exist_ok=True)
+    projects_file.touch()
+
 current_dir = os.getcwd()
 project_name = os.path.basename(current_dir)
 
