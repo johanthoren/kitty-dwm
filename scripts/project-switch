@@ -23,10 +23,14 @@ def wait_for_key():
 projects_file = Path.home() / ".config/kitty/projects"
 
 if not projects_file.exists():
-    print(f"No projects file found at {projects_file}")
+    # Create empty projects file on first run
+    projects_file.parent.mkdir(parents=True, exist_ok=True)
+    projects_file.touch()
+    print("No projects configured yet.")
+    print("Add projects with Cmd+Alt+P or edit ~/.config/kitty/projects")
     print("Press any key to close...")
     wait_for_key()
-    sys.exit(1)
+    sys.exit(0)
 
 # Build project map: basename -> full path
 project_map = {}
