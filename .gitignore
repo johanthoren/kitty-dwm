@@ -1,2 +1,7 @@
 CLAUDE.md
 .claude/
+
+# Personal project lists and temporary files
+projects
+projects.tmp
+*.local
