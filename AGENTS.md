@@ -30,7 +30,7 @@ Used for actions that create entirely new contexts (project, directory, remote h
 - Run fzf selector in the new tab
 - Auto-close tab if user cancels (Escape) via `&&` chain
 - Stay in tab and execute action if selection made
-- Examples: Project switcher (cmd+shift+p), directory jumper (cmd+shift+z), SSH launcher (cmd+shift+s)
+- Examples: Project switcher (cmd+shift+p), directory jumper (cmd+shift+z), SSH launcher (cmd+shift+n)
 
 #### Overlay Pattern (Context-Enhancing Actions)
 Used for actions that work within/enhance the current context:
@@ -72,7 +72,7 @@ Used for actions that work within/enhance the current context:
 make install
 
 # Test configuration changes
-# Reload kitty with: cmd+shift+r (keybinding in config)
+# Reload kitty with: cmd+ctrl+r (keybinding in config)
 ```
 
 ## Important Implementation Details
@@ -105,7 +105,7 @@ make install
 When changing keybindings or integrations:
 
 1. Edit `kitty.conf` directly - this is the single source of truth
-2. Test by reloading config (cmd+shift+r within kitty)
+2. Test by reloading config (cmd+ctrl+r within kitty)
 3. Update README.md keybinding tables if adding/changing shortcuts
 4. Commit atomically - one logical change per commit
 
