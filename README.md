@@ -139,7 +139,7 @@ Projects are managed via an explicit inventory at `~/.config/kitty/projects`. Ea
 | Key | Action |
 |-----|--------|
 | `cmd+ctrl+c` | Copy last command output |
-| `cmd+ctrl+r` | Reload config |
+| `cmd+shift+;` / `cmd+shift+,` (Sw) | Reload config (semicolon key) |
 | `cmd+shift+m` / `cmd+shift+?` | Show keybindings reference |
 | `cmd+r` | Command history search |
 | `cmd+b` | Toggle tab bar |
