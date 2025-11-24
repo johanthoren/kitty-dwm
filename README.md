@@ -102,6 +102,7 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 | Key | Action | DWM Equivalent |
 |-----|--------|----------------|
 | `cmd+1` to `cmd+9` | Go to tab N | `Mod+[1-9]` (view tag) |
+| `cmd+shift+left` / `cmd+shift+right` | Move tab one slot left/right (wraps at ends) | - |
 | `cmd+t` | New tab | - |
 | `cmd+shift+t` | Close tab* | - |
 
