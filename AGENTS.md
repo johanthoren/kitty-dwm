@@ -21,6 +21,7 @@ The configuration maps dwm concepts to kitty equivalents:
 - dwm master/stack layout → kitty tall/fat layouts with 55/45 bias
 - dwm window focus (j/k) → kitty window navigation
 - dwm mfact adjustment (h/l) → kitty window resizing
+- tab reordering → cmd+shift+left/right moves the active tab one slot (kitty wraps at edges)
 
 ### Tool Integration Patterns
 
@@ -72,7 +73,7 @@ Used for actions that work within/enhance the current context:
 make install
 
 # Test configuration changes
-# Reload kitty with: cmd+ctrl+r (keybinding in config)
+# Reload kitty with: cmd+shift+; (semicolon key, Shift+, on Swedish layout)
 ```
 
 ## Important Implementation Details
@@ -105,7 +106,7 @@ make install
 When changing keybindings or integrations:
 
 1. Edit `kitty.conf` directly - this is the single source of truth
-2. Test by reloading config (cmd+ctrl+r within kitty)
+2. Test by reloading config (cmd+shift+; or cmd+shift+, on Swedish layout, within kitty)
 3. Update README.md keybinding tables if adding/changing shortcuts
 4. Commit atomically - one logical change per commit
 
