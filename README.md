@@ -122,7 +122,7 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 | `cmd+shift+z` | Directory jumper | zoxide picker → new tab in directory |
 | `cmd+shift+n` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
-| `cmd+shift+c` | Launch Claude/Codex | Host-aware launcher (personal machines open Claude, work laptop opens Codex) |
+| `cmd+shift+c` | Launch Claude Code | Open Claude Code AI assistant in new window |
 
 ### Project Management
 
