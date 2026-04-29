@@ -67,6 +67,13 @@ Used for actions that work within/enhance the current context:
 - Directory jumper uses `exec zsh` to replace the selector process with a shell in the chosen directory
 - Integrates with zoxide for MRU directory tracking
 
+**Pi Integration**
+- Pi is the recommended terminal coding agent for this configuration
+- `cmd+shift+c` launches Pi in the current directory using kitty `--cwd=current`
+- `cmd+shift+d` launches Pi in `~/Desktop` using kitty `--cwd=~/Desktop`
+- Launchers use `zsh -ic "exec pi"` so kitty gets the user's interactive shell PATH without hard-coding a private Pi install path
+- Do not add Pi CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
+
 ## Installation and Testing
 
 ```bash
@@ -143,5 +150,6 @@ All managed via Makefile, but critical ones:
 - **zoxide**: Directory jumper backend
 - **kitten ssh**: Built-in SSH client with automatic remote shell integration
 - **lazygit**: Git TUI overlay
+- **Pi**: Recommended coding agent launched by `cmd+shift+c` and `cmd+shift+d`
 - Ensure that the README.md and CLAUDE.md are both up-to-date when changing the behavior of the configuration.
 - Never include git-attribution or co-authored-by.

@@ -29,6 +29,7 @@ Key aspects ported from my dwm setup:
   - All use fzf for selection with keyboard-driven workflows
   - SSH and project scripts written in Python for reliability
   - SSH uses kitten ssh for automatic remote shell integration
+- **Pi coding agent launcher**: `cmd+shift+c` opens Pi in the current directory; `cmd+shift+d` opens Pi in `~/Desktop`
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
 - **Window state memory**: Remembers window size, position, and fullscreen state
 - **Gruvbox Material theme**: Softer dark palette with high-visibility active borders and muted inactive borders
@@ -40,6 +41,7 @@ Key aspects ported from my dwm setup:
 
 - macOS (Linux/BSD users: replace `cmd` with your mod key in config)
 - [Homebrew](https://brew.sh)
+- [Node.js/npm](https://nodejs.org/) for the recommended Pi coding agent
 
 ### Quick Install
 
@@ -50,7 +52,7 @@ make install
 ```
 
 This will:
-1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide)
+1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide, Pi)
 2. Create symlinks to your `~/.config/kitty/` directory
 3. Prompt before overwriting existing configs
 
@@ -62,6 +64,7 @@ This will:
 # Install dependencies
 brew install --cask kitty
 brew install fzf bat neovim lazygit zoxide
+npm install -g @mariozechner/pi-coding-agent
 
 # Link configs
 ln -s ~/.config/kitty-dwm/kitty.conf ~/.config/kitty/kitty.conf
@@ -166,6 +169,7 @@ Projects are managed via an explicit inventory at `~/.config/kitty/projects`. Ea
 - **[neovim](https://neovim.io/)** - Text editor
 - **[lazygit](https://github.com/jesseduffield/lazygit)** - Git TUI
 - **[zoxide](https://github.com/ajeetdsouza/zoxide)** - Smart directory jumper
+- **[Pi](https://pi.dev/)** - Recommended terminal coding agent launched from kitty
 
 ## Configuration
 
