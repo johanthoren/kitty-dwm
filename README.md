@@ -123,8 +123,8 @@ Available layouts: tall (master/stack) and stack (fullscreen cycling)
 | `cmd+shift+z` | Directory jumper | zoxide picker → new tab in directory |
 | `cmd+shift+n` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
-| `cmd+shift+c` | Launch OpenCode | Open OpenCode with the `forgemaster` agent in the current directory |
-| `cmd+shift+d` | Launch OpenCode on Desktop | Open OpenCode with the `forgemaster` agent in `~/Desktop` for daily reviews/non-code workflows |
+| `cmd+shift+c` | Launch Pi | Open Pi in the current directory |
+| `cmd+shift+d` | Launch Pi on Desktop | Open Pi in `~/Desktop` for daily reviews/non-code workflows |
 
 ### Project Management
 

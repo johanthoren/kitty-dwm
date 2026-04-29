@@ -129,9 +129,10 @@ Font size:
 
 Fullscreen moved to `cmd+shift+f` to free up `cmd+f` for find
 
-OpenCode:
-- `cmd+shift+c` - Launch OpenCode with the `forgemaster` agent in the current directory
-- `cmd+shift+d` - Launch OpenCode with the `forgemaster` agent in `~/Desktop`
+Pi:
+- `cmd+shift+c` - Launch Pi in the current directory
+- `cmd+shift+d` - Launch Pi in `~/Desktop`
+- Pi launchers use `zsh -ic "exec pi"` so kitty gets the user's interactive shell PATH while passing no arguments to Pi; directory context is supplied by kitty `--cwd`
 
 ## Dependencies
 
