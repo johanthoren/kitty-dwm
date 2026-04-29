@@ -11,14 +11,15 @@ This is a kitty terminal configuration that ports personal dwm window manager ke
 ### Configuration Structure
 
 - **kitty.conf**: Main configuration file with all keybindings, layouts, and integrations
-- **oceanic-next.conf**: Color scheme (included via `include` directive in main config)
+- **current-theme.conf**: Active Gruvbox Material color scheme (included via `include` directive in main config)
+- **oceanic-next.conf**: Legacy/base color scheme include kept for compatibility
 - **Makefile**: Installation automation with dependency management
 
 ### DWM Philosophy Port
 
 The configuration maps dwm concepts to kitty equivalents:
 - dwm tags (1-9) → kitty tabs (1-9)
-- dwm master/stack layout → kitty tall/fat layouts with 55/45 bias
+- dwm master/stack layout → kitty tall/stack layouts with 50/50 bias
 - dwm window focus (j/k) → kitty window navigation
 - dwm mfact adjustment (h/l) → kitty window resizing
 - tab reordering → cmd+shift+left/right moves the active tab one slot (kitty wraps at edges)
@@ -78,6 +79,10 @@ make install
 
 ## Important Implementation Details
 
+### Appearance Details
+- Active window borders use Gruvbox Material bright yellow (`#d8a657`) at `3pt` for readability
+- Inactive window borders use muted Gruvbox gray (`#665c54`) to reduce visual noise
+
 ### Keybinding Conflicts
 - Uses `cmd` as MODKEY for macOS (would be Super/Mod on Linux/BSD)
 - ALL default kitty shortcuts are cleared via `clear_all_shortcuts yes`
@@ -123,6 +128,10 @@ Font size:
 - `cmd+0` - Reset
 
 Fullscreen moved to `cmd+shift+f` to free up `cmd+f` for find
+
+OpenCode:
+- `cmd+shift+c` - Launch OpenCode with the `forgemaster` agent in the current directory
+- `cmd+shift+d` - Launch OpenCode with the `forgemaster` agent in `~/Desktop`
 
 ## Dependencies
 

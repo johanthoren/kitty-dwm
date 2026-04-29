@@ -8,7 +8,7 @@ This configuration recreates my dwm window manager experience within kitty. The 
 
 Key aspects ported from my dwm setup:
 
-- **Master/Stack layouts** - Tall layout with 55/45 split ratio
+- **Master/Stack layouts** - Tall layout with an even 50/50 split ratio
 - **hjkl navigation** - Window focus and resizing
 - **Tag-based tabs** - My 1-9 tag workflow mapped to kitty tabs
 - **Keyboard-driven** - All operations via keybindings
@@ -31,7 +31,7 @@ Key aspects ported from my dwm setup:
   - SSH uses kitten ssh for automatic remote shell integration
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
 - **Window state memory**: Remembers window size, position, and fullscreen state
-- **Oceanic Next theme**: Clean, modern color scheme
+- **Gruvbox Material theme**: Softer dark palette with high-visibility active borders and muted inactive borders
 - **Shell integration**: Cursor shape protection, process detection
 
 ## Installation
@@ -66,6 +66,7 @@ brew install fzf bat neovim lazygit zoxide
 # Link configs
 ln -s ~/.config/kitty-dwm/kitty.conf ~/.config/kitty/kitty.conf
 ln -s ~/.config/kitty-dwm/oceanic-next.conf ~/.config/kitty/oceanic-next.conf
+ln -s ~/.config/kitty-dwm/current-theme.conf ~/.config/kitty/current-theme.conf
 ```
 
 ## Keybindings
@@ -95,7 +96,7 @@ ln -s ~/.config/kitty-dwm/oceanic-next.conf ~/.config/kitty/oceanic-next.conf
 |-----|--------|----------------|
 | `cmd+shift+l` | Cycle layouts | `Mod+t/m/f` (setlayout) |
 
-Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cycling)
+Available layouts: tall (master/stack) and stack (fullscreen cycling)
 
 ### Tab Management (Tags)
 
@@ -122,7 +123,8 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 | `cmd+shift+z` | Directory jumper | zoxide picker → new tab in directory |
 | `cmd+shift+n` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
-| `cmd+shift+c` | Launch Claude/Codex | Host-aware launcher (personal machines open Claude, work laptop opens Codex) |
+| `cmd+shift+c` | Launch OpenCode | Open OpenCode with the `forgemaster` agent in the current directory |
+| `cmd+shift+d` | Launch OpenCode on Desktop | Open OpenCode with the `forgemaster` agent in `~/Desktop` for daily reviews/non-code workflows |
 
 ### Project Management
 
@@ -179,15 +181,15 @@ The main configuration is in `kitty.conf`. Key sections:
 
 Edit `kitty.conf` to customize:
 - Change `cmd` to your preferred mod key
-- Adjust layout bias (default 55% master)
-- Modify color scheme (see `oceanic-next.conf`)
+- Adjust layout bias (default 50% master)
+- Modify color scheme (see `current-theme.conf`; `oceanic-next.conf` remains as the legacy base include)
 - Add/remove FZF integrations
 
 ## DWM Mapping Comparison
 
 | DWM Concept | Kitty Equivalent | Implementation |
 |-------------|------------------|----------------|
-| Master/Stack | Tall/Fat layouts | `enabled_layouts tall:bias=55;...` |
+| Master/Stack | Tall/Stack layouts | `enabled_layouts tall:bias=50;...` |
 | Tags (1-9) | Tabs (1-9) | `goto_tab N` |
 | focusstack | Window focus | `next_window` / `previous_window` |
 | setmfact | Resize master | `resize_window narrower/wider` |
@@ -210,6 +212,6 @@ MIT License
 
 - Inspired by [dwm](https://dwm.suckless.org/) by suckless.org
 - Built on [kitty](https://sw.kovidgoyal.net/kitty/) by Kovid Goyal
-- Theme: [Oceanic Next](https://github.com/voronianski/oceanic-next-color-scheme)
+- Theme: [Gruvbox Material](https://github.com/sainnhe/gruvbox-material)
 
 Special thanks to Kovid Goyal for creating kitty - it's like you read my mind.
