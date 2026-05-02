@@ -8,7 +8,7 @@ This configuration recreates my dwm window manager experience within kitty. The 
 
 Key aspects ported from my dwm setup:
 
-- **Master/Stack layouts** - Tall layout with 55/45 split ratio
+- **Master/Stack layouts** - Tall layout with an even 50/50 split ratio
 - **hjkl navigation** - Window focus and resizing
 - **Tag-based tabs** - My 1-9 tag workflow mapped to kitty tabs
 - **Keyboard-driven** - All operations via keybindings
@@ -29,9 +29,10 @@ Key aspects ported from my dwm setup:
   - All use fzf for selection with keyboard-driven workflows
   - SSH and project scripts written in Python for reliability
   - SSH uses kitten ssh for automatic remote shell integration
+- **Pi coding agent launcher**: `cmd+shift+c` opens Pi in the current directory; `cmd+shift+d` opens Pi in `~/Desktop`
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
 - **Window state memory**: Remembers window size, position, and fullscreen state
-- **Oceanic Next theme**: Clean, modern color scheme
+- **Gruvbox Material theme**: Softer dark palette with high-visibility active borders and muted inactive borders
 - **Shell integration**: Cursor shape protection, process detection
 
 ## Installation
@@ -40,6 +41,7 @@ Key aspects ported from my dwm setup:
 
 - macOS (Linux/BSD users: replace `cmd` with your mod key in config)
 - [Homebrew](https://brew.sh)
+- [Node.js/npm](https://nodejs.org/) for the recommended Pi coding agent
 
 ### Quick Install
 
@@ -50,7 +52,7 @@ make install
 ```
 
 This will:
-1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide)
+1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide, Pi)
 2. Create symlinks to your `~/.config/kitty/` directory
 3. Prompt before overwriting existing configs
 
@@ -62,10 +64,12 @@ This will:
 # Install dependencies
 brew install --cask kitty
 brew install fzf bat neovim lazygit zoxide
+npm install -g @mariozechner/pi-coding-agent
 
 # Link configs
 ln -s ~/.config/kitty-dwm/kitty.conf ~/.config/kitty/kitty.conf
 ln -s ~/.config/kitty-dwm/oceanic-next.conf ~/.config/kitty/oceanic-next.conf
+ln -s ~/.config/kitty-dwm/current-theme.conf ~/.config/kitty/current-theme.conf
 ```
 
 ## Keybindings
@@ -95,7 +99,7 @@ ln -s ~/.config/kitty-dwm/oceanic-next.conf ~/.config/kitty/oceanic-next.conf
 |-----|--------|----------------|
 | `cmd+shift+l` | Cycle layouts | `Mod+t/m/f` (setlayout) |
 
-Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cycling)
+Available layouts: tall (master/stack) and stack (fullscreen cycling)
 
 ### Tab Management (Tags)
 
@@ -122,7 +126,8 @@ Available layouts: tall (master/stack), fat (stack/master), stack (fullscreen cy
 | `cmd+shift+z` | Directory jumper | zoxide picker → new tab in directory |
 | `cmd+shift+n` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
-| `cmd+shift+c` | Launch OpenCode | Opens OpenCode in a new window with the current working directory |
+| `cmd+shift+c` | Launch Pi | Open Pi in the current directory |
+| `cmd+shift+d` | Launch Pi on Desktop | Open Pi in `~/Desktop` for daily reviews/non-code workflows |
 
 ### Project Management
 
@@ -164,6 +169,7 @@ Projects are managed via an explicit inventory at `~/.config/kitty/projects`. Ea
 - **[neovim](https://neovim.io/)** - Text editor
 - **[lazygit](https://github.com/jesseduffield/lazygit)** - Git TUI
 - **[zoxide](https://github.com/ajeetdsouza/zoxide)** - Smart directory jumper
+- **[Pi](https://pi.dev/)** - Recommended terminal coding agent launched from kitty
 
 ## Configuration
 
@@ -179,15 +185,15 @@ The main configuration is in `kitty.conf`. Key sections:
 
 Edit `kitty.conf` to customize:
 - Change `cmd` to your preferred mod key
-- Adjust layout bias (default 55% master)
-- Modify color scheme (see `oceanic-next.conf`)
+- Adjust layout bias (default 50% master)
+- Modify color scheme (see `current-theme.conf`; `oceanic-next.conf` remains as the legacy base include)
 - Add/remove FZF integrations
 
 ## DWM Mapping Comparison
 
 | DWM Concept | Kitty Equivalent | Implementation |
 |-------------|------------------|----------------|
-| Master/Stack | Tall/Fat layouts | `enabled_layouts tall:bias=55;...` |
+| Master/Stack | Tall/Stack layouts | `enabled_layouts tall:bias=50;...` |
 | Tags (1-9) | Tabs (1-9) | `goto_tab N` |
 | focusstack | Window focus | `next_window` / `previous_window` |
 | setmfact | Resize master | `resize_window narrower/wider` |
@@ -210,6 +216,6 @@ MIT License
 
 - Inspired by [dwm](https://dwm.suckless.org/) by suckless.org
 - Built on [kitty](https://sw.kovidgoyal.net/kitty/) by Kovid Goyal
-- Theme: [Oceanic Next](https://github.com/voronianski/oceanic-next-color-scheme)
+- Theme: [Gruvbox Material](https://github.com/sainnhe/gruvbox-material)
 
 Special thanks to Kovid Goyal for creating kitty - it's like you read my mind.

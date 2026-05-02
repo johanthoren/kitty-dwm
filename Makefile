@@ -43,4 +43,8 @@ deps:
 	@echo "✓ lazygit installed"
 	@command -v zoxide >/dev/null 2>&1 || { echo "Installing zoxide..."; brew install zoxide; }
 	@echo "✓ zoxide installed"
+	@command -v npm >/dev/null 2>&1 || { echo "✗ npm not found. Install Node.js/npm to install Pi: https://nodejs.org/"; exit 1; }
+	@echo "✓ npm installed"
+	@command -v pi >/dev/null 2>&1 || { echo "Installing Pi..."; npm install -g @mariozechner/pi-coding-agent; }
+	@echo "✓ Pi installed"
 	@echo ""

@@ -11,14 +11,15 @@ This is a kitty terminal configuration that ports personal dwm window manager ke
 ### Configuration Structure
 
 - **kitty.conf**: Main configuration file with all keybindings, layouts, and integrations
-- **oceanic-next.conf**: Color scheme (included via `include` directive in main config)
+- **current-theme.conf**: Active Gruvbox Material color scheme (included via `include` directive in main config)
+- **oceanic-next.conf**: Legacy/base color scheme include kept for compatibility
 - **Makefile**: Installation automation with dependency management
 
 ### DWM Philosophy Port
 
 The configuration maps dwm concepts to kitty equivalents:
 - dwm tags (1-9) → kitty tabs (1-9)
-- dwm master/stack layout → kitty tall/fat layouts with 55/45 bias
+- dwm master/stack layout → kitty tall/stack layouts with 50/50 bias
 - dwm window focus (j/k) → kitty window navigation
 - dwm mfact adjustment (h/l) → kitty window resizing
 - tab reordering → cmd+shift+left/right moves the active tab one slot (kitty wraps at edges)
@@ -66,6 +67,13 @@ Used for actions that work within/enhance the current context:
 - Directory jumper uses `exec zsh` to replace the selector process with a shell in the chosen directory
 - Integrates with zoxide for MRU directory tracking
 
+**Pi Integration**
+- Pi is the recommended terminal coding agent for this configuration
+- `cmd+shift+c` launches Pi in the current directory using kitty `--cwd=current`
+- `cmd+shift+d` launches Pi in `~/Desktop` using kitty `--cwd=~/Desktop`
+- Launchers use `zsh -ic "exec pi"` so kitty gets the user's interactive shell PATH without hard-coding a private Pi install path
+- Do not add Pi CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
+
 ## Installation and Testing
 
 ```bash
@@ -77,6 +85,10 @@ make install
 ```
 
 ## Important Implementation Details
+
+### Appearance Details
+- Active window borders use Gruvbox Material bright yellow (`#d8a657`) at `3pt` for readability
+- Inactive window borders use muted Gruvbox gray (`#665c54`) to reduce visual noise
 
 ### Keybinding Conflicts
 - Uses `cmd` as MODKEY for macOS (would be Super/Mod on Linux/BSD)
@@ -124,6 +136,11 @@ Font size:
 
 Fullscreen moved to `cmd+shift+f` to free up `cmd+f` for find
 
+Pi:
+- `cmd+shift+c` - Launch Pi in the current directory
+- `cmd+shift+d` - Launch Pi in `~/Desktop`
+- Pi launchers use `zsh -ic "exec pi"` so kitty gets the user's interactive shell PATH while passing no arguments to Pi; directory context is supplied by kitty `--cwd`
+
 ## Dependencies
 
 All managed via Makefile, but critical ones:
@@ -133,5 +150,6 @@ All managed via Makefile, but critical ones:
 - **zoxide**: Directory jumper backend
 - **kitten ssh**: Built-in SSH client with automatic remote shell integration
 - **lazygit**: Git TUI overlay
+- **Pi**: Recommended coding agent launched by `cmd+shift+c` and `cmd+shift+d`
 - Ensure that the README.md and CLAUDE.md are both up-to-date when changing the behavior of the configuration.
 - Never include git-attribution or co-authored-by.
