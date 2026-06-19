@@ -29,7 +29,7 @@ Key aspects ported from my dwm setup:
   - All use fzf for selection with keyboard-driven workflows
   - SSH and project scripts written in Python for reliability
   - SSH uses kitten ssh for automatic remote shell integration
-- **Pi coding agent launcher**: `cmd+shift+c` opens Pi in the current directory; `cmd+shift+d` opens Pi in `~/Desktop`
+- **Claude Code launcher**: `cmd+shift+c` opens Claude Code in the current directory; `cmd+shift+d` opens Claude Code in `~/Desktop`
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
 - **Window state memory**: Remembers window size, position, and fullscreen state
 - **Gruvbox Material theme**: Softer dark palette with high-visibility active borders and muted inactive borders
@@ -41,7 +41,7 @@ Key aspects ported from my dwm setup:
 
 - macOS (Linux/BSD users: replace `cmd` with your mod key in config)
 - [Homebrew](https://brew.sh)
-- [Node.js/npm](https://nodejs.org/) for the recommended Pi coding agent
+- [Node.js/npm](https://nodejs.org/) for the recommended Claude Code agent
 
 ### Quick Install
 
@@ -52,7 +52,7 @@ make install
 ```
 
 This will:
-1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide, Pi)
+1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide, Claude Code)
 2. Create symlinks to your `~/.config/kitty/` directory
 3. Prompt before overwriting existing configs
 
@@ -64,7 +64,7 @@ This will:
 # Install dependencies
 brew install --cask kitty
 brew install fzf bat neovim lazygit zoxide
-npm install -g @mariozechner/pi-coding-agent
+npm install -g @anthropic-ai/claude-code
 
 # Link configs
 ln -s ~/.config/kitty-dwm/kitty.conf ~/.config/kitty/kitty.conf
@@ -126,8 +126,8 @@ Available layouts: tall (master/stack) and stack (fullscreen cycling)
 | `cmd+shift+z` | Directory jumper | zoxide picker → new tab in directory |
 | `cmd+shift+n` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
-| `cmd+shift+c` | Launch Pi | Open Pi in the current directory |
-| `cmd+shift+d` | Launch Pi on Desktop | Open Pi in `~/Desktop` for daily reviews/non-code workflows |
+| `cmd+shift+c` | Launch Claude Code | Open Claude Code in the current directory |
+| `cmd+shift+d` | Launch Claude Code on Desktop | Open Claude Code in `~/Desktop` for daily reviews/non-code workflows |
 
 ### Project Management
 
@@ -169,7 +169,7 @@ Projects are managed via an explicit inventory at `~/.config/kitty/projects`. Ea
 - **[neovim](https://neovim.io/)** - Text editor
 - **[lazygit](https://github.com/jesseduffield/lazygit)** - Git TUI
 - **[zoxide](https://github.com/ajeetdsouza/zoxide)** - Smart directory jumper
-- **[Pi](https://pi.dev/)** - Recommended terminal coding agent launched from kitty
+- **[Claude Code](https://docs.claude.com/en/docs/claude-code)** - Recommended terminal coding agent launched from kitty
 
 ## Configuration
 
