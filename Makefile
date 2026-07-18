@@ -25,7 +25,7 @@ install: deps
 		echo "✓ Linked ~/.config/kitty -> $(PWD)"; \
 	fi
 	@echo ""
-	@echo "Installation complete! Reload kitty config with cmd+shift+r"
+	@echo "Installation complete! Reload kitty config with cmd+shift+; (or cmd+shift+, on Swedish layout)"
 
 deps:
 	@echo "Checking dependencies..."

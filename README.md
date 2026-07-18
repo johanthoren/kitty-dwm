@@ -17,7 +17,7 @@ Key aspects ported from my dwm setup:
 ## Features
 
 - **DWM-style layouts**: Tall, fat, and stack layouts with master/stack ratio control
-- **Custom tab bar**: Always-visible tab bar with date/time status display
+- **Quota tab bar**: Always-visible, color-coded OpenAI and Claude quota percentages with reset timers
 - **Project management**: Projectile-inspired workflow with explicit inventory
   - Named project tabs (focus existing or create new)
   - Quick project switching with fzf
@@ -72,6 +72,8 @@ brew install can1357/tap/omp
 ln -s ~/.config/kitty-dwm/kitty.conf ~/.config/kitty/kitty.conf
 ln -s ~/.config/kitty-dwm/oceanic-next.conf ~/.config/kitty/oceanic-next.conf
 ln -s ~/.config/kitty-dwm/current-theme.conf ~/.config/kitty/current-theme.conf
+ln -s ~/.config/kitty-dwm/tab_bar.py ~/.config/kitty/tab_bar.py
+ln -s ~/.config/kitty-dwm/scripts ~/.config/kitty/scripts
 ```
 
 ## Keybindings
@@ -179,11 +181,35 @@ Projects are managed via an explicit inventory at `~/.config/kitty/projects`. Ea
 
 The main configuration is in `kitty.conf`. Key sections:
 
-- **Appearance**: Font (MesloLGS Nerd Font), borders, theme inclusion
+- **Appearance**: Font (MesloLGS Nerd Font), borders, theme inclusion, quota tab bar
 - **Layouts**: DWM-style tall/fat/stack configurations
 - **Keybindings**: All mappings using `cmd` as mod key (macOS)
 - **FZF Integrations**: Tool launchers and pickers
 - **Behavior**: Shell integration, remote control, confirmations
+
+### Quota tracker
+
+The right side of the tab bar shows the percentage remaining and time until reset for each available quota window:
+
+```text
+OAI wk 56% 6d16h │ CL 5h 75% 2h15m wk 40% 4d3h
+```
+
+- `OAI` is teal and reads live OpenAI Codex limits from `omp usage --json`.
+- `CL` is orange and reads Claude Code's native five-hour and seven-day rate limits.
+- Healthy percentages are green, 20% or less is yellow, and 10% or less is red.
+- `--` means that no real usage snapshot is available. `!` means the auto-refreshed OpenAI cache is older than five minutes.
+- OpenAI usage refreshes every minute. Reset timers repaint every 15 seconds.
+
+Claude Code supplies its rate limits only to its status line command. Feed the same status line JSON to the cache helper before formatting the line:
+
+```bash
+input=$(cat)
+printf '%s' "$input" | ~/.config/kitty/scripts/quota-cache --claude >/dev/null 2>&1
+# Continue the existing status line formatter using "$input".
+```
+
+The helper writes only percentages and reset timestamps to `${XDG_CACHE_HOME:-$HOME/.cache}/kitty-dwm`; it never caches credentials or account identifiers. If Claude shows `--`, open Claude Code, run `/usage`, then close the usage view once so its status line can cache the real limits.
 
 ### Customization
 

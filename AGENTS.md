@@ -14,6 +14,8 @@ This is a kitty terminal configuration that ports personal dwm window manager ke
 - **current-theme.conf**: Active Gruvbox Material color scheme (included via `include` directive in main config)
 - **oceanic-next.conf**: Legacy/base color scheme include kept for compatibility
 - **Makefile**: Installation automation with dependency management
+- **tab_bar.py**: Custom powerline tab renderer with the global quota tracker
+- **scripts/quota-cache**: Credential-free cache bridge for OMP and Claude Code usage data
 
 ### DWM Philosophy Port
 
@@ -73,6 +75,13 @@ Used for actions that work within/enhance the current context:
 - `cmd+shift+d` launches OMP in `~/Desktop` using kitty `--cwd=~/Desktop`
 - Launchers use `zsh -ic "exec omp"` so kitty gets the user's interactive shell PATH without hard-coding a private OMP install path
 - Do not add OMP CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
+
+**Quota Status**
+- `tab_bar.py` keeps the quota status at the right edge for every tab and repaints reset timers every 15 seconds
+- OpenAI data comes from `omp usage --provider openai-codex --json`, launched through `zsh -ic` so the interactive PATH resolves OMP
+- Claude data comes only from native Claude Code status line JSON piped to `scripts/quota-cache --claude`; initialize it by opening `/usage` and then closing the view
+- Cache files contain percentages and reset timestamps only under `${XDG_CACHE_HOME:-$HOME/.cache}/kitty-dwm`
+- Missing data renders as `--`; only auto-refreshed OpenAI data older than five minutes renders with `!`
 
 ## Installation and Testing
 
