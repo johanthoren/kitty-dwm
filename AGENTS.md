@@ -39,7 +39,7 @@ Used for actions that work within/enhance the current context:
 - Launch with `--type=overlay` to show over current window
 - Use `--allow-remote-control` if need to send results back to parent window
 - Overlay auto-closes after action completes
-- Examples: Git TUI (cmd+shift+g), file finder (cmd+p), search scrollback (cmd+shift+h), command history (cmd+r)
+- Examples: Git TUI (cmd+shift+g), file finder (cmd+g), search scrollback (cmd+shift+h), command history (cmd+r)
 
 #### Tool-Specific Details
 
@@ -67,12 +67,12 @@ Used for actions that work within/enhance the current context:
 - Directory jumper uses `exec zsh` to replace the selector process with a shell in the chosen directory
 - Integrates with zoxide for MRU directory tracking
 
-**Pi Integration**
-- Pi is the recommended terminal coding agent for this configuration
-- `cmd+shift+c` launches Pi in the current directory using kitty `--cwd=current`
-- `cmd+shift+d` launches Pi in `~/Desktop` using kitty `--cwd=~/Desktop`
-- Launchers use `zsh -ic "exec pi"` so kitty gets the user's interactive shell PATH without hard-coding a private Pi install path
-- Do not add Pi CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
+**OMP Integration**
+- OMP is the default agentic shell for this configuration
+- `cmd+shift+c` launches OMP in the current directory using kitty `--cwd=current`
+- `cmd+shift+d` launches OMP in `~/Desktop` using kitty `--cwd=~/Desktop`
+- Launchers use `zsh -ic "exec omp"` so kitty gets the user's interactive shell PATH without hard-coding a private OMP install path
+- Do not add OMP CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
 
 ## Installation and Testing
 
@@ -126,7 +126,7 @@ When changing keybindings or integrations:
 
 Search functionality uses a three-tier approach:
 - `cmd+f` - Find in files by content (ripgrep → nvim at line)
-- `cmd+p` - Find files by name (fzf → nvim)
+- `cmd+g` - Find files by name (fzf → nvim)
 - `cmd+shift+h` - Find in scrollback (fzf → clipboard)
 
 Font size:
@@ -136,20 +136,21 @@ Font size:
 
 Fullscreen moved to `cmd+shift+f` to free up `cmd+f` for find
 
-Pi:
-- `cmd+shift+c` - Launch Pi in the current directory
-- `cmd+shift+d` - Launch Pi in `~/Desktop`
-- Pi launchers use `zsh -ic "exec pi"` so kitty gets the user's interactive shell PATH while passing no arguments to Pi; directory context is supplied by kitty `--cwd`
+OMP:
+- `cmd+shift+c` - Launch OMP in the current directory
+- `cmd+shift+d` - Launch OMP in `~/Desktop`
+- OMP launchers use `zsh -ic "exec omp"` so kitty gets the user's interactive shell PATH while passing no arguments to OMP; directory context is supplied by kitty `--cwd`
+- `cmd+p` forwards `ctrl+p` to cycle OMP models
 
 ## Dependencies
 
-All managed via Makefile, but critical ones:
+Critical dependencies and integrations:
 - **fzf**: Core of all interactive launchers
 - **ripgrep**: File content search backend
 - **kitten @**: Remote control commands (ships with kitty)
 - **zoxide**: Directory jumper backend
 - **kitten ssh**: Built-in SSH client with automatic remote shell integration
 - **lazygit**: Git TUI overlay
-- **Pi**: Recommended coding agent launched by `cmd+shift+c` and `cmd+shift+d`
+- **OMP**: Default agentic shell launched by `cmd+shift+c` and `cmd+shift+d`
 - Ensure that the README.md and CLAUDE.md are both up-to-date when changing the behavior of the configuration.
 - Never include git-attribution or co-authored-by.

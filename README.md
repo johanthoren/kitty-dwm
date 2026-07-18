@@ -29,7 +29,7 @@ Key aspects ported from my dwm setup:
   - All use fzf for selection with keyboard-driven workflows
   - SSH and project scripts written in Python for reliability
   - SSH uses kitten ssh for automatic remote shell integration
-- **Claude Code launcher**: `cmd+shift+c` opens Claude Code in the current directory; `cmd+shift+d` opens Claude Code in `~/Desktop`
+- **OMP launcher**: `cmd+shift+c` opens OMP in the current directory; `cmd+shift+d` opens OMP in `~/Desktop`
 - **Process protection**: Warns before closing tabs with running processes (SSH, builds, etc.)
 - **Window state memory**: Remembers window size, position, and fullscreen state
 - **Gruvbox Material theme**: Softer dark palette with high-visibility active borders and muted inactive borders
@@ -41,7 +41,8 @@ Key aspects ported from my dwm setup:
 
 - macOS (Linux/BSD users: replace `cmd` with your mod key in config)
 - [Homebrew](https://brew.sh)
-- [Node.js/npm](https://nodejs.org/) for the recommended Claude Code agent
+- [OMP](https://omp.sh) on `PATH` for the agent launcher keybindings
+- [Node.js/npm](https://nodejs.org/) for the dependency check in `make install`
 
 ### Quick Install
 
@@ -52,7 +53,7 @@ make install
 ```
 
 This will:
-1. Install kitty and all dependencies (fzf, bat, neovim, lazygit, zoxide, Claude Code)
+1. Install kitty and the managed dependencies (fzf, bat, neovim, lazygit, zoxide, Claude Code); install OMP separately
 2. Create symlinks to your `~/.config/kitty/` directory
 3. Prompt before overwriting existing configs
 
@@ -65,6 +66,7 @@ This will:
 brew install --cask kitty
 brew install fzf bat neovim lazygit zoxide
 npm install -g @anthropic-ai/claude-code
+brew install can1357/tap/omp
 
 # Link configs
 ln -s ~/.config/kitty-dwm/kitty.conf ~/.config/kitty/kitty.conf
@@ -117,7 +119,8 @@ Available layouts: tall (master/stack) and stack (fullscreen cycling)
 | Key | Action | Description |
 |-----|--------|-------------|
 | `cmd+f` | Find in files | ripgrep content search → opens in neovim at matching line |
-| `cmd+p` | File finder | fzf file picker → opens in neovim |
+| `cmd+g` | File finder | fzf file picker → opens in neovim |
+| `cmd+p` | Cycle OMP model | Forward `ctrl+p` to OMP |
 | `cmd+u` | Open URL | Select URL from screen and open in browser |
 | `cmd+shift+i` | Insert path | Select path from screen and insert at cursor |
 | `cmd+shift+o` | Open path in nvim | Select path from screen and open in neovim |
@@ -126,8 +129,8 @@ Available layouts: tall (master/stack) and stack (fullscreen cycling)
 | `cmd+shift+z` | Directory jumper | zoxide picker → new tab in directory |
 | `cmd+shift+n` | SSH launcher | fzf picker showing hosts with user@destination:port or type ad-hoc connection → new tab with SSH session (kitten ssh for remote shell integration) |
 | `cmd+shift+h` | Search scrollback | fzf search → copy to clipboard |
-| `cmd+shift+c` | Launch Claude Code | Open Claude Code in the current directory |
-| `cmd+shift+d` | Launch Claude Code on Desktop | Open Claude Code in `~/Desktop` for daily reviews/non-code workflows |
+| `cmd+shift+c` | Launch OMP | Open OMP in the current directory |
+| `cmd+shift+d` | Launch OMP on Desktop | Open OMP in `~/Desktop` for daily reviews/non-code workflows |
 
 ### Project Management
 
@@ -169,7 +172,8 @@ Projects are managed via an explicit inventory at `~/.config/kitty/projects`. Ea
 - **[neovim](https://neovim.io/)** - Text editor
 - **[lazygit](https://github.com/jesseduffield/lazygit)** - Git TUI
 - **[zoxide](https://github.com/ajeetdsouza/zoxide)** - Smart directory jumper
-- **[Claude Code](https://docs.claude.com/en/docs/claude-code)** - Recommended terminal coding agent launched from kitty
+- **[OMP](https://omp.sh)** - Default agentic shell launched from kitty
+- **[Claude Code](https://docs.claude.com/en/docs/claude-code)** - Installed by the current automated dependency setup
 
 ## Configuration
 
