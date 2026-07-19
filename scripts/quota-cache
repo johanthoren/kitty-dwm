@@ -31,7 +31,7 @@ def parse_window(limit: dict[str, Any]) -> tuple[str, dict[str, float]] | None:
     window_id = scope.get("windowId")
     amount = limit.get("amount") or {}
     reset = (limit.get("window") or {}).get("resetsAt")
-    if window_id not in WINDOWS or scope.get("tier") or limit.get("status") != "ok":
+    if window_id not in WINDOWS or scope.get("tier"):
         return None
     used_fraction = amount.get("usedFraction")
     if used_fraction is None and amount.get("used") is not None and amount.get("limit"):

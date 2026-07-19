@@ -55,12 +55,17 @@ def reset_in(resets_at: float, now: float) -> str:
     return f"{minutes}m"
 
 
-def quota_color(remaining: int) -> int:
-    if remaining <= 10:
+def quota_color(used: int) -> int:
+    if used >= 90:
         return COLORS["critical"]
-    if remaining <= 20:
+    if used >= 80:
         return COLORS["warning"]
     return COLORS["healthy"]
+
+
+def usage_bar(used: int) -> str:
+    filled = used * 8 // 100
+    return "█" * filled + "░" * (8 - filled)
 
 
 def provider_spans(
@@ -83,15 +88,14 @@ def provider_spans(
                 found = True
             continue
         try:
-            remaining = max(0, min(100, round(100 - float(window["usedPercentage"]))))
+            used = max(0, min(100, round(float(window["usedPercentage"]))))
             timer = reset_in(float(window["resetsAt"]), now)
         except (KeyError, TypeError, ValueError):
             continue
         spans.extend(
             (
-                (f" {window_label} ", COLORS["muted"], False),
-                (f"{remaining}%", quota_color(remaining), True),
-                (f" {timer}", COLORS["muted"], False),
+                (f" {window_label} {timer} ", COLORS["muted"], False),
+                (f"{usage_bar(used)} {used}%", quota_color(used), True),
             )
         )
         found = True
@@ -128,7 +132,7 @@ def mark_tab_bars_dirty(timer_id: int | None = None) -> None:
         tab_manager.mark_tab_bar_dirty()
 
 
-def refresh_usage(timer_id: int | None = None) -> None:
+def collect_usage() -> None:
     global _collector, _last_collect
     now = time.monotonic()
     if _collector is not None and _collector.poll() is not None:
@@ -141,6 +145,10 @@ def refresh_usage(timer_id: int | None = None) -> None:
             stderr=subprocess.DEVNULL,
         )
         _last_collect = now
+
+
+def refresh_usage(timer_id: int | None = None) -> None:
+    collect_usage()
     mark_tab_bars_dirty()
 
 
@@ -185,6 +193,7 @@ def draw_tab(
         )
 
     ensure_refresh_timer()
+    collect_usage()
     spans = status_spans()
     status_start = screen.columns - wcswidth("".join(part for part, _, _ in spans))
     tab_count = _tab_counts.get(draw_data.os_window_id, index)

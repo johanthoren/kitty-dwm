@@ -189,15 +189,15 @@ The main configuration is in `kitty.conf`. Key sections:
 
 ### Quota tracker
 
-The right side of the tab bar shows the percentage remaining and time until reset for each available quota window:
+The right side of the tab bar shows each quota window as its reset timer, eight-cell usage bar, and percentage used:
 
 ```text
-OAI wk 56% 6d16h │ CL 5h 75% 2h15m wk 40% 4d3h
+OAI wk 6d16h ███░░░░░ 44% │ CL 5h 2h15m ██░░░░░░ 25% wk 4d3h ████░░░░ 60%
 ```
 
 - `OAI` is teal and reads live OpenAI Codex limits from `omp usage --json`.
 - `CL` is orange and reads Claude Code's native five-hour and seven-day rate limits.
-- Healthy percentages are green, 20% or less is yellow, and 10% or less is red.
+- Usage below 80% is green, 80% or more is yellow, and 90% or more is red.
 - `--` means that no real usage snapshot is available. `!` means the auto-refreshed OpenAI cache is older than five minutes.
 - OpenAI usage refreshes every minute. Reset timers repaint every 15 seconds.
 

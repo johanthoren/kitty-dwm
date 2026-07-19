@@ -77,7 +77,7 @@ Used for actions that work within/enhance the current context:
 - Do not add OMP CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
 
 **Quota Status**
-- `tab_bar.py` keeps the quota status at the right edge for every tab and repaints reset timers every 15 seconds
+- `tab_bar.py` keeps quota windows at the right edge as reset timer, eight-cell usage bar, then percentage used; reset timers repaint every 15 seconds
 - OpenAI data comes from `omp usage --provider openai-codex --json`, launched through `zsh -ic` so the interactive PATH resolves OMP
 - Claude data comes only from native Claude Code status line JSON piped to `scripts/quota-cache --claude`; initialize it by opening `/usage` and then closing the view
 - Cache files contain percentages and reset timestamps only under `${XDG_CACHE_HOME:-$HOME/.cache}/kitty-dwm`
