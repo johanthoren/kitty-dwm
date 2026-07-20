@@ -15,7 +15,8 @@ This is a kitty terminal configuration that ports personal dwm window manager ke
 - **oceanic-next.conf**: Legacy/base color scheme include kept for compatibility
 - **Makefile**: Installation automation with dependency management
 - **tab_bar.py**: Custom powerline tab renderer with the global quota tracker
-- **scripts/quota-cache**: Credential-free cache bridge for OMP and Claude Code usage data
+- **scripts/quota-cache**: Credential-free cache bridge for OMP, Grok billing, and Claude Code usage data
+- **scripts/open-at-line**: Argv-safe neovim opener used by `cmd+f` / `cmd+g` (`nvim "+line" -- path`)
 
 ### DWM Philosophy Port
 
@@ -61,7 +62,7 @@ Used for actions that work within/enhance the current context:
 **SSH Integration**
 - SSH launcher parses ~/.ssh/config to display host details (user, hostname, port)
 - Custom Python wrapper scripts handle connection string parsing (user@host:port formats)
-- Scripts in scripts/ directory: ssh-list (parse config), ssh-connect (launch kitten ssh)
+- Scripts in scripts/ directory: ssh-list (parse config), ssh-connect (launch kitten ssh; rejects flag-like hosts)
 - Error visibility via command display and disconnect messages
 - Uses `wait_for_key()` helper for "press any key to close" on disconnect
 
@@ -77,11 +78,12 @@ Used for actions that work within/enhance the current context:
 - Do not add OMP CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
 
 **Quota Status**
-- `tab_bar.py` keeps quota windows at the right edge as reset timer, eight-cell usage bar, then percentage used; reset timers repaint every 15 seconds
+- `tab_bar.py` keeps quota groups at the right edge as provider badge, ten-cell background bar with its reset countdown inside, then percentage used; a local 24-hour clock sits at the far right, and the tab bar repaints every second
 - OpenAI data comes from `omp usage --provider openai-codex --json`, launched through `zsh -ic` so the interactive PATH resolves OMP
+- Grok data comes from `https://cli-chat-proxy.grok.com/v1/billing` (monthly absolute + `?format=credits` weekly percent), authenticated with `omp token xai-oauth --raw`
 - Claude data comes only from native Claude Code status line JSON piped to `scripts/quota-cache --claude`; initialize it by opening `/usage` and then closing the view
 - Cache files contain percentages and reset timestamps only under `${XDG_CACHE_HOME:-$HOME/.cache}/kitty-dwm`
-- Missing data renders as `--`; only auto-refreshed OpenAI data older than five minutes renders with `!`
+- Missing data renders as `--`; only auto-refreshed OpenAI or Grok data older than five minutes renders with `!`
 
 ## Installation and Testing
 
@@ -134,8 +136,8 @@ When changing keybindings or integrations:
 ## Key Keybindings to Remember
 
 Search functionality uses a three-tier approach:
-- `cmd+f` - Find in files by content (ripgrep → nvim at line)
-- `cmd+g` - Find files by name (fzf → nvim)
+- `cmd+f` - Find in files by content (ripgrep `--color=never` → fzf → `scripts/open-at-line`)
+- `cmd+g` - Find files by name (fzf → `scripts/open-at-line`)
 - `cmd+shift+h` - Find in scrollback (fzf → clipboard)
 
 Font size:

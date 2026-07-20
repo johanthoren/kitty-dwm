@@ -17,7 +17,7 @@ Key aspects ported from my dwm setup:
 ## Features
 
 - **DWM-style layouts**: Tall, fat, and stack layouts with master/stack ratio control
-- **Quota tab bar**: Always-visible, color-coded OpenAI and Claude quota percentages with reset timers
+- **Quota tab bar**: Always-visible, color-coded OpenAI, Grok, and Claude quota percentages with reset timers
 - **Project management**: Projectile-inspired workflow with explicit inventory
   - Named project tabs (focus existing or create new)
   - Quick project switching with fzf
@@ -55,7 +55,7 @@ make install
 This will:
 1. Install kitty and the managed dependencies (fzf, bat, neovim, lazygit, zoxide, Claude Code); install OMP separately
 2. Create symlinks to your `~/.config/kitty/` directory
-3. Prompt before overwriting existing configs
+3. Prompt before replacing an existing `~/.config/kitty`; if you confirm, move it to a timestamped `~/.config/kitty.bak.*` backup, then symlink
 
 **Important**: On macOS, grant kitty Full Disk Access in System Settings → Privacy & Security → Full Disk Access. This is required for integrations (file finder, scrollback search, etc.) to work properly.
 
@@ -120,8 +120,8 @@ Available layouts: tall (master/stack) and stack (fullscreen cycling)
 
 | Key | Action | Description |
 |-----|--------|-------------|
-| `cmd+f` | Find in files | ripgrep content search → opens in neovim at matching line |
-| `cmd+g` | File finder | fzf file picker → opens in neovim |
+| `cmd+f` | Find in files | ripgrep content search → `scripts/open-at-line` opens neovim at the matching line |
+| `cmd+g` | File finder | fzf file picker → `scripts/open-at-line` opens neovim |
 | `cmd+p` | Cycle OMP model | Forward `ctrl+p` to OMP |
 | `cmd+u` | Open URL | Select URL from screen and open in browser |
 | `cmd+shift+i` | Insert path | Select path from screen and insert at cursor |
@@ -189,17 +189,18 @@ The main configuration is in `kitty.conf`. Key sections:
 
 ### Quota tracker
 
-The right side of the tab bar shows each quota window as its reset timer, eight-cell usage bar, and percentage used:
+The right side of the tab bar groups quota windows by provider. Each ten-cell usage bar prints its reset countdown inside the colored bar, followed by the percentage used. A local 24-hour clock sits at the far right. Shown without terminal background colors:
 
 ```text
-OAI wk 6d16h ███░░░░░ 44% │ CL 5h 2h15m ██░░░░░░ 25% wk 4d3h ████░░░░ 60%
+● OAI wk [  5d10h   ] 85%  ● XAI wk [  5d23h   ] 2% · mo [  11d8h   ] 1%  ● CC 5h [    5h    ] 41% · wk [  3d10h   ] 47%   23:42
 ```
 
 - `OAI` is teal and reads live OpenAI Codex limits from `omp usage --json`.
-- `CL` is orange and reads Claude Code's native five-hour and seven-day rate limits.
+- `XAI` is pink and reads SuperGrok weekly/monthly credit usage from Grok's billing API via `omp token xai-oauth`.
+- `CC` is orange and reads Claude Code's native five-hour and seven-day rate limits.
 - Usage below 80% is green, 80% or more is yellow, and 90% or more is red.
-- `--` means that no real usage snapshot is available. `!` means the auto-refreshed OpenAI cache is older than five minutes.
-- OpenAI usage refreshes every minute. Reset timers repaint every 15 seconds.
+- `--` means that no real usage snapshot is available. `!` means an auto-refreshed OpenAI or Grok cache is older than five minutes.
+- OpenAI and Grok usage refresh every minute. Reset timers and the clock repaint every second.
 
 Claude Code supplies its rate limits only to its status line command. Feed the same status line JSON to the cache helper before formatting the line:
 
@@ -209,7 +210,7 @@ printf '%s' "$input" | ~/.config/kitty/scripts/quota-cache --claude >/dev/null 2
 # Continue the existing status line formatter using "$input".
 ```
 
-The helper writes only percentages and reset timestamps to `${XDG_CACHE_HOME:-$HOME/.cache}/kitty-dwm`; it never caches credentials or account identifiers. If Claude shows `--`, open Claude Code, run `/usage`, then close the usage view once so its status line can cache the real limits.
+The helper writes only percentages and reset timestamps to `${XDG_CACHE_HOME:-$HOME/.cache}/kitty-dwm`; it never caches credentials or account identifiers. Grok needs an authenticated `xai-oauth` account in OMP (`omp token xai-oauth`). If Claude shows `--`, open Claude Code, run `/usage`, then close the usage view once so its status line can cache the real limits.
 
 ### Customization
 

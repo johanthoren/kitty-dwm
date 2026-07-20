@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Cache OpenAI and Claude subscription usage for kitty's tab bar."""
+"""Cache OpenAI, Claude, and Grok subscription usage for kitty's tab bar."""
 
 import json
 import os
@@ -7,11 +7,14 @@ import subprocess
 import sys
 import tempfile
 import time
+import urllib.request
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
 CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "kitty-dwm"
 WINDOWS = {"5h": "fiveHour", "7d": "weekly"}
+GROK_BILLING_URL = "https://cli-chat-proxy.grok.com/v1/billing"
 
 
 def write_cache(name: str, data: dict[str, Any]) -> None:
@@ -63,6 +66,59 @@ def cache_openai() -> None:
     write_cache("openai-usage.json", {"updatedAt": time.time(), **windows})
 
 
+def parse_iso_timestamp(value: str) -> float:
+    return datetime.fromisoformat(value.replace("Z", "+00:00")).timestamp()
+
+
+def grok_window(used_percentage: float, resets_at: str) -> dict[str, float]:
+    return {
+        "usedPercentage": max(0.0, min(100.0, float(used_percentage))),
+        "resetsAt": parse_iso_timestamp(resets_at),
+    }
+
+
+def cache_grok() -> None:
+    token = subprocess.run(
+        ["/bin/zsh", "-ic", "exec omp token xai-oauth --raw"],
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=15,
+    ).stdout.strip()
+    if not token:
+        raise RuntimeError("OMP returned no xai-oauth token")
+
+    headers = {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/json",
+        "User-Agent": "kitty-dwm/quota-cache",
+    }
+
+    def fetch(url: str) -> dict[str, Any]:
+        request = urllib.request.Request(url, headers=headers)
+        with urllib.request.urlopen(request, timeout=15) as response:
+            return json.load(response)
+
+    monthly = (fetch(GROK_BILLING_URL).get("config") or {})
+    credits = (fetch(f"{GROK_BILLING_URL}?format=credits").get("config") or {})
+    windows: dict[str, dict[str, float]] = {}
+
+    used = (monthly.get("used") or {}).get("val")
+    limit = (monthly.get("monthlyLimit") or {}).get("val")
+    month_end = monthly.get("billingPeriodEnd")
+    if used is not None and limit and month_end:
+        windows["monthly"] = grok_window(100.0 * float(used) / float(limit), month_end)
+
+    week_end = (credits.get("currentPeriod") or {}).get("end") or credits.get("billingPeriodEnd")
+    week_used = credits.get("creditUsagePercent")
+    if week_used is not None and week_end:
+        windows["weekly"] = grok_window(float(week_used), week_end)
+
+    if not windows:
+        raise RuntimeError("Grok billing returned no supported quota windows")
+    write_cache("grok-usage.json", {"updatedAt": time.time(), **windows})
+
+
 def parse_claude_window(rate_limits: dict[str, Any], source: str) -> dict[str, float] | None:
     window = rate_limits.get(source) or {}
     used = window.get("used_percentage")
@@ -89,7 +145,14 @@ def main() -> None:
     elif sys.argv[1:]:
         raise SystemExit("usage: quota-cache [--claude]")
     else:
-        cache_openai()
+        errors = []
+        for name, fn in (("openai", cache_openai), ("grok", cache_grok)):
+            try:
+                fn()
+            except Exception as exc:  # keep the other provider's cache warm
+                errors.append(f"{name}: {exc}")
+        if len(errors) == 2:
+            raise SystemExit("; ".join(errors))
 
 
 if __name__ == "__main__":

@@ -21,14 +21,21 @@ CACHE_DIR = Path(os.environ.get("XDG_CACHE_HOME", Path.home() / ".cache")) / "ki
 COLLECTOR = Path.home() / ".config/kitty/scripts/quota-cache"
 COLLECT_INTERVAL = 60
 STALE_AFTER = 300
+BAR_WIDTH = 10
 COLORS = {
     "openai": 0x7DAEA3,
     "claude": 0xE78A4E,
+    "grok": 0xD3869B,
     "healthy": 0xA9B665,
     "warning": 0xD8A657,
     "critical": 0xEA6962,
     "muted": 0x928374,
+    "background": 0x282828,
+    "foreground": 0xD4BE98,
+    "track": 0x3C3836,
 }
+
+StatusSpan = tuple[str, int, int | None, bool]
 
 _collector: subprocess.Popen[bytes] | None = None
 _last_collect = 0.0
@@ -49,9 +56,9 @@ def reset_in(resets_at: float, now: float) -> str:
     hours, seconds = divmod(seconds, 3600)
     minutes = seconds // 60
     if days:
-        return f"{days}d{hours}h"
+        return f"{days}d" + (f"{hours}h" if hours else "")
     if hours:
-        return f"{hours}h{minutes}m"
+        return f"{hours}h" + (f"{minutes}m" if minutes else "")
     return f"{minutes}m"
 
 
@@ -63,9 +70,16 @@ def quota_color(used: int) -> int:
     return COLORS["healthy"]
 
 
-def usage_bar(used: int) -> str:
-    filled = used * 8 // 100
-    return "█" * filled + "░" * (8 - filled)
+def usage_bar(used: int, timer: str) -> list[StatusSpan]:
+    text = timer.center(BAR_WIDTH)
+    filled = used * BAR_WIDTH // 100
+    color = quota_color(used)
+    spans: list[StatusSpan] = []
+    if filled:
+        spans.append((text[:filled], COLORS["background"], color, True))
+    if filled < BAR_WIDTH:
+        spans.append((text[filled:], COLORS["foreground"], COLORS["track"], True))
+    return spans
 
 
 def provider_spans(
@@ -76,15 +90,16 @@ def provider_spans(
     now: float,
     show_missing: bool = False,
     stale_after: float | None = None,
-) -> list[tuple[str, int, bool]]:
+) -> list[StatusSpan]:
     cache = load_cache(cache_name)
-    spans = [(f" {label}", color, True)]
+    spans: list[StatusSpan] = [(f" ● {label} ", color, None, True)]
     found = False
     for key, window_label in expected_windows:
         window = cache.get(key)
+        separator = "" if not found else " · "
         if not isinstance(window, dict):
             if show_missing:
-                spans.append((f" {window_label} --", COLORS["muted"], False))
+                spans.append((f"{separator}{window_label} --", COLORS["muted"], None, False))
                 found = True
             continue
         try:
@@ -94,20 +109,22 @@ def provider_spans(
             continue
         spans.extend(
             (
-                (f" {window_label} {timer} ", COLORS["muted"], False),
-                (f"{usage_bar(used)} {used}%", quota_color(used), True),
+                (f"{separator}{window_label} ", COLORS["muted"], None, False),
+                *usage_bar(used, timer),
+                (f" {used}%", quota_color(used), None, True),
             )
         )
         found = True
     if not found:
-        spans.append((" --", COLORS["muted"], False))
+        spans.append(("--", COLORS["muted"], None, False))
     if cache and stale_after is not None and now - float(cache.get("updatedAt", 0)) > stale_after:
-        spans.append((" !", COLORS["warning"], True))
+        spans.append((" !", COLORS["warning"], None, True))
     return spans
 
 
-def status_spans(now: float | None = None) -> list[tuple[str, int, bool]]:
+def status_spans(now: float | None = None) -> list[StatusSpan]:
     now = time.time() if now is None else now
+    clock = time.strftime("%H:%M", time.localtime(now))
     openai = provider_spans(
         "OAI",
         COLORS["openai"],
@@ -116,15 +133,33 @@ def status_spans(now: float | None = None) -> list[tuple[str, int, bool]]:
         now,
         stale_after=STALE_AFTER,
     )
+    grok = provider_spans(
+        "XAI",
+        COLORS["grok"],
+        "grok-usage.json",
+        (("weekly", "wk"), ("monthly", "mo")),
+        now,
+        stale_after=STALE_AFTER,
+    )
     claude = provider_spans(
-        "CL",
+        "CC",
         COLORS["claude"],
         "claude-usage.json",
         (("fiveHour", "5h"), ("weekly", "wk")),
         now,
         show_missing=True,
     )
-    return [*openai, (" │", COLORS["muted"], False), *claude, (" ", COLORS["muted"], False)]
+    sep: StatusSpan = (" ", COLORS["muted"], None, False)
+    return [
+        *openai,
+        sep,
+        *grok,
+        sep,
+        *claude,
+        ("   ", COLORS["warning"], None, False),
+        (clock, COLORS["foreground"], None, True),
+        (" ", COLORS["muted"], None, False),
+    ]
 
 
 def mark_tab_bars_dirty(timer_id: int | None = None) -> None:
@@ -159,18 +194,20 @@ def ensure_refresh_timer() -> None:
         return
     setattr(boss, attribute, True)
     add_timer(refresh_usage, 0, False)
-    add_timer(refresh_usage, 15, True)
+    add_timer(refresh_usage, 1, True)
 
 
-def draw_status(draw_data: DrawData, screen: Screen, spans: list[tuple[str, int, bool]]) -> int:
-    text = "".join(part for part, _, _ in spans)
+def draw_status(draw_data: DrawData, screen: Screen, spans: list[StatusSpan]) -> int:
+    text = "".join(part for part, _, _, _ in spans)
     start = max(0, screen.columns - wcswidth(text))
     screen.cursor.x = start
-    screen.cursor.bg = as_rgb(int(draw_data.default_bg))
-    for part, color, bold in spans:
+    default_bg = as_rgb(int(draw_data.default_bg))
+    for part, color, background, bold in spans:
         screen.cursor.fg = as_rgb(color)
+        screen.cursor.bg = default_bg if background is None else as_rgb(background)
         screen.cursor.bold = bold
         screen.draw(part)
+    screen.cursor.bg = default_bg
     screen.cursor.bold = False
     return start
 
@@ -195,7 +232,7 @@ def draw_tab(
     ensure_refresh_timer()
     collect_usage()
     spans = status_spans()
-    status_start = screen.columns - wcswidth("".join(part for part, _, _ in spans))
+    status_start = screen.columns - wcswidth("".join(part for part, _, _, _ in spans))
     tab_count = _tab_counts.get(draw_data.os_window_id, index)
     tab_boundary = max(3, status_start * index // max(1, tab_count))
     available = max(3, tab_boundary - before)
