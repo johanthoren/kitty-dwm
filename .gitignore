@@ -6,3 +6,9 @@ CLAUDE.md
 projects
 projects.tmp
 *.local
+
+# Build/debug noise
+__pycache__/
+*.pyc
+keybinding-debug.txt
+scratchpads/

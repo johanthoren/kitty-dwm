@@ -142,11 +142,6 @@ def display_keybindings():
     # Pipe to fzf and get selection
     fzf_input = "\n".join(lines)
 
-    # Always write debug first to see if we even get here
-    debug_file = Path.home() / ".config/kitty/keybinding-debug.txt"
-    with open(debug_file, "w") as f:
-        f.write("Script reached fzf section\n")
-
     subprocess.run(
         [
             "fzf",

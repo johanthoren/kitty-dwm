@@ -13,8 +13,10 @@ install: deps
 	elif [ -e ~/.config/kitty ]; then \
 		read -p "~/.config/kitty already exists. Replace with symlink? (y/N) " answer; \
 		if [ "$$answer" = "y" ] || [ "$$answer" = "Y" ]; then \
-			rm -rf ~/.config/kitty; \
+			backup="$$HOME/.config/kitty.bak.$$(date +%Y%m%d%H%M%S)"; \
+			mv ~/.config/kitty "$$backup"; \
 			ln -s $(PWD) ~/.config/kitty; \
+			echo "✓ Backed up previous config to $$backup"; \
 			echo "✓ Linked ~/.config/kitty -> $(PWD)"; \
 		else \
 			echo "✗ Skipped installation"; \

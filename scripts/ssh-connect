@@ -31,6 +31,12 @@ if match:
     port = match.group(1)
     input_str = input_str[:match.start()]
 
+# Reject flag-like targets so values cannot smuggle ssh options.
+host_part = input_str.split('@', 1)[-1]
+if not input_str or input_str.startswith('-') or host_part.startswith('-'):
+    print(f"Invalid SSH host: {sys.argv[1]!r}", file=sys.stderr)
+    sys.exit(2)
+
 # Build command with connection timeout
 cmd = ['kitten', 'ssh', '-o', 'ConnectTimeout=10']
 if port:
