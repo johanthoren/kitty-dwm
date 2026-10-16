@@ -49,7 +49,7 @@ def parse_window(limit: dict[str, Any]) -> tuple[str, dict[str, float]] | None:
 
 def cache_openai() -> None:
     result = subprocess.run(
-        ["/bin/zsh", "-ic", "exec omp usage --provider openai-codex --json"],
+        ["/opt/homebrew/bin/bash", "-lc", "exec omp usage --provider openai-codex --json"],
         check=True,
         capture_output=True,
         text=True,
@@ -79,7 +79,7 @@ def grok_window(used_percentage: float, resets_at: str) -> dict[str, float]:
 
 def cache_grok() -> None:
     token = subprocess.run(
-        ["/bin/zsh", "-ic", "exec omp token xai-oauth --raw"],
+        ["/opt/homebrew/bin/bash", "-lc", "exec omp token xai-oauth --raw"],
         check=True,
         capture_output=True,
         text=True,

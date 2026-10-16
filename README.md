@@ -233,8 +233,8 @@ Edit `kitty.conf` to customize:
 
 ## Tips
 
-1. **Shell setup**: This configuration assumes zsh with [Powerlevel10k](https://github.com/romkatv/powerlevel10k) prompt. Some settings (like `ignore-shell` in close confirmations) are specifically to accommodate p10k's background processes.
-2. **Shell integration**: Requires zsh/bash with kitty integration for process detection
+1. **Shell setup**: This configuration assumes Homebrew bash 5 (`/opt/homebrew/bin/bash`) as the login shell. Apple's bash 3.2 does not support kitty's automatic shell integration. `cmd+r` searches `~/.bash_history`.
+2. **Shell integration**: Requires bash 5 with kitty integration for process detection; `ignore-shell` in close confirmations ignores the shell itself and prompt background jobs
 3. **Remote processes**: Confirmation works for local processes (including SSH client), but not processes on remote hosts
 4. **SSH sessions**: Use `cmd+shift+n` to select from ~/.ssh/config (showing host details) or type any connection (formats: host, user@host, host:port, user@host:port). Uses `kitten ssh` for automatic remote shell integration, enabling features like `cmd+ctrl+c` to copy last command output even on remote hosts. Confirms before closing only when processes are running; shows command and disconnect message for troubleshooting
 5. **Project workflow**: Projects are managed via `~/.config/kitty/projects` (one path per line). Use `cmd+shift+p` to switch between projects - it will focus existing tabs or create new ones. Each project tab is named after the project directory. Use `cmd+alt+p` to add current directory to projects, `cmd+ctrl+p` to remove, and `cmd+ctrl+shift+p` to prune deleted directories

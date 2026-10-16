@@ -67,19 +67,19 @@ Used for actions that work within/enhance the current context:
 - Uses `wait_for_key()` helper for "press any key to close" on disconnect
 
 **Directory Navigation**
-- Directory jumper uses `exec zsh` to replace the selector process with a shell in the chosen directory
+- Directory jumper uses `exec /opt/homebrew/bin/bash` to replace the selector process with a shell in the chosen directory
 - Integrates with zoxide for MRU directory tracking
 
 **OMP Integration**
 - OMP is the default agentic shell for this configuration
 - `cmd+shift+c` launches OMP in the current directory using kitty `--cwd=current`
 - `cmd+shift+d` launches OMP in `~/Desktop` using kitty `--cwd=~/Desktop`
-- Launchers use `zsh -ic "exec omp"` so kitty gets the user's interactive shell PATH without hard-coding a private OMP install path
+- Launchers use `/opt/homebrew/bin/bash -lc "exec omp"` so the login profile sets PATH without hard-coding a private OMP install path
 - Do not add OMP CLI arguments to these keybindings unless explicitly requested; directory context should come from kitty `--cwd`
 
 **Quota Status**
 - `tab_bar.py` keeps quota groups at the right edge as provider badge, ten-cell background bar with its reset countdown inside, then percentage used; a local 24-hour clock sits at the far right, and the tab bar repaints every second
-- OpenAI data comes from `omp usage --provider openai-codex --json`, launched through `zsh -ic` so the interactive PATH resolves OMP
+- OpenAI data comes from `omp usage --provider openai-codex --json`, launched through `/opt/homebrew/bin/bash -lc` so the login PATH resolves OMP
 - Grok data comes from `https://cli-chat-proxy.grok.com/v1/billing` (monthly absolute + `?format=credits` weekly percent), authenticated with `omp token xai-oauth --raw`
 - Claude data comes only from native Claude Code status line JSON piped to `scripts/quota-cache --claude`; initialize it by opening `/usage` and then closing the view
 - Cache files contain percentages and reset timestamps only under `${XDG_CACHE_HOME:-$HOME/.cache}/kitty-dwm`
@@ -107,8 +107,9 @@ make install
 - Font size uses both `cmd+plus` (Swedish keyboard) and `cmd+equal` (US keyboard)
 
 ### Shell Integration Requirements
-- Assumes zsh with Powerlevel10k prompt
-- `ignore-shell` flag in close confirmations specifically handles p10k background processes
+- Assumes Homebrew bash 5 (`/opt/homebrew/bin/bash`) as the login shell; kitty's automatic bash integration does not support Apple's bash 3.2
+- Inline `launch` commands and Python helpers call `/opt/homebrew/bin/bash` by full path: kitty resolves a bare `bash` with its own minimal PATH and would start Apple's 3.2
+- `cmd+r` reads `~/.bash_history`, which the shared `.bashrc` appends to after every command
 - `shell_integration enabled no-cursor` enables process detection while preventing cursor shape changes
 
 ### Remote Control Architecture
@@ -121,7 +122,7 @@ make install
 - `close_window_with_confirmation ignore-shell` only confirms for actual processes (SSH, htop, etc.)
 - Tab closing uses `close_tab` (not `close_tab_with_confirmation` - that action doesn't exist)
 - `confirm_os_window_close 1` handles confirmation for tabs with multiple windows containing processes
-- `ignore-shell` prevents false positives from Powerlevel10k background jobs
+- `ignore-shell` prevents false positives from prompt background jobs
 - Relies on shell integration to detect running processes
 
 ## Modification Workflow
@@ -150,7 +151,7 @@ Fullscreen moved to `cmd+shift+f` to free up `cmd+f` for find
 OMP:
 - `cmd+shift+c` - Launch OMP in the current directory
 - `cmd+shift+d` - Launch OMP in `~/Desktop`
-- OMP launchers use `zsh -ic "exec omp"` so kitty gets the user's interactive shell PATH while passing no arguments to OMP; directory context is supplied by kitty `--cwd`
+- OMP launchers use `/opt/homebrew/bin/bash -lc "exec omp"` so the login profile sets PATH while passing no arguments to OMP; directory context is supplied by kitty `--cwd`
 - `cmd+p` forwards `ctrl+p` to cycle OMP models
 
 ## Dependencies

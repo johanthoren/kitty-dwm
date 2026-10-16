@@ -174,7 +174,7 @@ def collect_usage() -> None:
         _collector = None
     if _collector is None and now - _last_collect >= COLLECT_INTERVAL and COLLECTOR.is_file():
         _collector = subprocess.Popen(
-            ["/bin/zsh", "-ic", 'exec "$1"', "quota-cache", str(COLLECTOR)],
+            ["/opt/homebrew/bin/bash", "-lc", 'exec "$1"', "quota-cache", str(COLLECTOR)],
             stdin=subprocess.DEVNULL,
             stdout=subprocess.DEVNULL,
             stderr=subprocess.DEVNULL,

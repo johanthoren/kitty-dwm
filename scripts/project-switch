@@ -81,7 +81,7 @@ try:
         # Change directory, set title, and launch shell
         os.chdir(project_path)
         subprocess.run(['kitten', '@', 'set-tab-title', project_name])
-        os.execvp('zsh', ['zsh'])
+        os.execvp('/opt/homebrew/bin/bash', ['/opt/homebrew/bin/bash'])
 
 except Exception as e:
     print(f"Error: {e}")
